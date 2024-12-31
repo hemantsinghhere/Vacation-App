@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Vacations{% endblock %}
+
+{% block content %}
+<section class="category-page">
+    <h1>{{ category.name }} Dream Vacations</h1>
+    
+    <div class="vacations-grid">
+        {% for vacation in vacations %}
+            <div class="vacation-card card">
+                <img src="{{ vacation.image.url }}" alt="{{ vacation.title }}" class="vacation-image">
+                <div class="vacation-content">
+                    <h2>{{ vacation.title }}</h2>
+                    <p>{{ vacation.description|truncatewords:30 }}</p>
+                    <p class="interaction-count">
+                        Total Interactions: {{ vacation.total_interactions }}
+                    </p>
+                    <a href="{% url 'vacation_detail' vacation.id %}" class="button">View Details</a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="no-vacations">No vacation ideas in this category yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<style>
+    .vacations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 1rem 0;
+    }
+
+    .vacation-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .vacation-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .vacation-content {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .interaction-count {
+        margin-top: auto;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .no-vacations {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

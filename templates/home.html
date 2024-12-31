@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Dream Vacations</h1>
+    
+    {% if top_vacation %}
+        <section class="card">
+            <h2>Top Dream Vacation</h2>
+            <h3>{{ top_vacation.title }}</h3>
+            <img src="{{ top_vacation.image.url }}" alt="{{ top_vacation.title }}" style="max-width: 400px;">
+            <p>{{ top_vacation.description }}</p>
+            <p>Category: {{ top_vacation.category.name }}</p>
+            <p>Total Interactions: {{ top_vacation.total_interactions }}</p>
+        </section>
+    {% endif %}
+    
+    <section>
+        <h2>Categories</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+                <div class="card">
+                    <h3>{{ category.name }}</h3>
+                    <a href="{% url 'category' category.slug %}" class="button">View Vacations</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div id="search-results"></div>
+{% endblock %}
