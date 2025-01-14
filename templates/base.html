@@ -10,8 +10,19 @@
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
-            --background-color: #f5f6fa;
-            --text-color: #2c3e50;
+            --background-color: #f5f6fa; /* Light background */
+            --text-color: #2c3e50; /* Dark text for light mode */
+            --card-bg: #ffffff; /* Card background color */
+            --dropdown-bg: #ffffff; /* Dropdown background color */
+        }
+
+        [data-theme="dark"] {
+            --background-color: #000000; /* Black background for dark mode */
+            --text-color: #ffffff; /* White text for dark mode */
+            --primary-color: #1a1a1a; /* Darker nav background */
+            --secondary-color: #2d89ef; /* Bright accent color */
+            --card-bg: #1a1a1a; /* Dark card background color */
+            --dropdown-bg: #1a1a1a; /* Dark dropdown background color */
         }
 
         body {
@@ -20,6 +31,7 @@
             font-family: Arial, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .navbar {
@@ -69,6 +81,8 @@
             padding: 0.5rem;
             border: none;
             border-radius: 4px;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .main-content {
@@ -78,11 +92,12 @@
         }
 
         .card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 1rem;
             margin-bottom: 1rem;
+            transition: background 0.3s, color 0.3s;
         }
 
         .button {
@@ -92,6 +107,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: opacity 0.3s;
         }
 
         .button:hover {
@@ -168,11 +184,16 @@
                     <a href="{% url 'login' %}">Login</a>
                 {% endif %}
             </div>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search vacations...">
-                <button class="button" onclick="searchVacations()">Search</button>
+            <div class="search-bar"> 
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search vacations..." 
+                    oninput="performsearch()"
+                >
+                <button class="button" onclick="performsearch()">Search</button>
+                <button class="button" id="themeToggle">🌙 Dark Mode</button>
             </div>
-            
         </div>
     </nav>
 

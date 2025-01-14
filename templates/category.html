@@ -3,12 +3,85 @@
 {% block title %}{{ category.name }} Vacations{% endblock %}
 
 {% block content %}
+<style>
+    .star-button {
+        font-size: 1.5rem; /* Smaller star */
+        background: transparent; /* Transparent background */
+        border: none; /* No border */
+        cursor: pointer;
+        padding: 0; /* Remove padding */
+        margin: 0; /* Remove margin */
+        transition: transform 0.3s ease; /* Smooth animation on hover */
+        color: gray; /* Default color for unfavorited state */
+    }
+
+    .star-button:hover {
+        transform: scale(1.5); /* Slightly enlarge on hover */
+    }
+
+    .star-button.favorited {
+        color: gold; /* Color for favorited state */
+        text-shadow: 0 0 10px gold, 0 0 20px orange;
+        animation: glow 1s infinite alternate; /* Glow animation */
+    }
+
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 10px gold, 0 0 20px orange;
+        }
+        to {
+            text-shadow: 0 0 20px gold, 0 0 30px orange;
+        }
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        cursor: pointer;
+        background-color: #3498db;
+        color: white;
+        border-radius: 4px;
+    }
+
+    .modal button.cancel {
+        background-color: #e74c3c;
+    }
+
+    .post {
+        margin: 1rem 0;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+</style>
 <section class="category-page">
     <h1>{{ category.name }} Dream Vacations</h1>
     
     <div class="vacations-grid">
         {% for vacation in vacations %}
-            <div class="vacation-card card">
+            <div class="vacation-card card" data-id="{{ vacation.id }}">
                 <img src="{{ vacation.image.url }}" alt="{{ vacation.title }}" class="vacation-image">
                 <div class="vacation-content">
                     <h2>{{ vacation.title }}</h2>
@@ -18,12 +91,21 @@
                     </p>
                     <a href="{% url 'vacation_detail' vacation.id %}" class="button">View Details</a>
                 </div>
+                <button class="star-button">⭐</button>
             </div>
         {% empty %}
             <p class="no-vacations">No vacation ideas in this category yet.</p>
         {% endfor %}
     </div>
 </section>
+
+<div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage">Are you sure you want to mark this post as favorite?</p>
+            <button id="confirmButton">Yes</button>
+            <button id="cancelButton" class="cancel">Cancel</button>
+        </div>
+    </div>
 
 <style>
     .vacations-grid {
@@ -67,4 +149,63 @@
         border-radius: 8px;
     }
 </style>
+
+<script>
+    const favorites = new Set(JSON.parse(localStorage.getItem("favorites") || "[]"));
+    let currentPostId = null;
+    let currentStarButton = null;
+
+    // Initialize the stars based on favorites in localStorage
+    document.querySelectorAll(".star-button").forEach(starButton => {
+        const postId = starButton.closest(".vacation-card").getAttribute("data-id");
+        if (favorites.has(postId)) {
+            starButton.classList.add("favorited");
+        }
+
+        // Add click event to each star button
+        starButton.addEventListener("click", (e) => {
+            currentStarButton = e.target;
+            currentPostId = e.target.closest(".vacation-card").getAttribute("data-id");
+
+            // Update the modal message based on current state
+            const isFavorited = currentStarButton.classList.contains("favorited");
+            document.getElementById("modalMessage").textContent = isFavorited 
+                ? "Are you sure you want to remove this post from favorites?" 
+                : "Are you sure you want to mark this post as favorite?";
+            document.getElementById("confirmButton").textContent = isFavorited ? "Yes, Remove" : "Yes, Mark as Favorite";
+
+            // Show the confirmation modal
+            document.getElementById("confirmModal").style.display = "flex";
+        });
+    });
+
+    // Handle the "Confirm" button
+    document.getElementById("confirmButton").addEventListener("click", () => {
+        if (currentStarButton) {
+            const isFavorited = currentStarButton.classList.contains("favorited");
+
+            if (isFavorited) {
+                // Remove from favorites
+                favorites.delete(currentPostId);
+                currentStarButton.classList.remove("favorited");
+            } else {
+                // Add to favorites
+                favorites.add(currentPostId);
+                currentStarButton.classList.add("favorited");
+            }
+
+            // Update localStorage
+            localStorage.setItem("favorites", JSON.stringify(Array.from(favorites)));
+
+            // Close the modal
+            document.getElementById("confirmModal").style.display = "none";
+        }
+    });
+
+    // Handle the "Cancel" button
+    document.getElementById("cancelButton").addEventListener("click", () => {
+        // Close the modal without making changes
+        document.getElementById("confirmModal").style.display = "none";
+    });
+</script>
 {% endblock %}
