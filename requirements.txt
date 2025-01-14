@@ -8,4 +8,5 @@ watchfiles==1.0.0
 websockets==14.1
 Django==4.2.6   # Replace with the version you're using
 gunicorn==23.0.0  # Gunicorn for production server
-Pillow==9.3.0     # For image handling (if you upload images)
+Pillow==9.3.0  
+whitenoise == 6.5.0   # For image handling (if you upload images)
